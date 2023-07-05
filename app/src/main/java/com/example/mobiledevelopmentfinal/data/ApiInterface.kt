@@ -1,5 +1,6 @@
 package com.example.mobiledevelopmentfinal.data
 
+import com.example.mobiledevelopmentfinal.data.forecastModels.Forecast
 import com.example.mobiledevelopmentfinal.data.models.CurrentWeather
 import retrofit2.Response
 import retrofit2.http.GET
@@ -12,4 +13,11 @@ interface ApiInterface {
         @Query("units") units: String,
         @Query("appid") apiKey: String
     ): Response<CurrentWeather>
+
+    @GET("forecast?")
+    suspend fun  getForecast(
+        @Query("q") city: String,
+        @Query("units") units: String,
+        @Query("appid") apiKey: String
+    ): Response<Forecast>
 }
