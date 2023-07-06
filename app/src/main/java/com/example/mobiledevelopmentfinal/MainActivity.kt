@@ -1,9 +1,17 @@
 package com.example.mobiledevelopmentfinal
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
+import android.location.Location
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.SearchView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevelopmentfinal.adapter.RvAdapter
@@ -11,6 +19,9 @@ import com.example.mobiledevelopmentfinal.data.forecastModels.ForecastData
 import com.example.mobiledevelopmentfinal.data.utils.RetrofitInstance
 import com.example.mobiledevelopmentfinal.databinding.ActivityMainBinding
 import com.example.mobiledevelopmentfinal.databinding.BottomSheetLayoutBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.Dispatchers
@@ -26,9 +37,11 @@ import kotlin.collections.ArrayList
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     val api_key: String = "7946d051fd8dcb8736a7e0b3505f7b80"
+    private var city: String = "genoa"
     private lateinit var sheetLayoutBinding: BottomSheetLayoutBinding
     private lateinit var dialog: BottomSheetDialog
     lateinit var pollutionFragment: PollutionFragment
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding =ActivityMainBinding.inflate(layoutInflater)
@@ -38,12 +51,67 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         pollutionFragment = PollutionFragment()
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
 
-        getCurrentWeather()
+        binding.searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener{
+            override fun onQueryTextSubmit(query: String?): Boolean {
+
+                if (query!= null){
+                    city = query
+                }
+                getCurrentWeather(city)
+                return true
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+
+        })
+
+        fetchLocation()
+        getCurrentWeather(city)
+
         binding.tvForecast.setOnClickListener{
             openDialog()
         }
 
+        binding.tvLocation.setOnClickListener {
+            fetchLocation()
+        }
+
+    }
+
+    //Works only on physical device
+    private fun fetchLocation() {
+        val task: Task<Location> = fusedLocationProviderClient.lastLocation
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        task.addOnSuccessListener {
+            val geoCoder = Geocoder(this, Locale.getDefault())
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
+                geoCoder.getFromLocation(it.latitude, it.longitude, 1, object: Geocoder.GeocodeListener{
+                    override fun onGeocode(locations: MutableList<Address>) {
+                        city = locations[0].locality
+                    }
+
+                })
+            }
+            else{
+                val location = geoCoder.getFromLocation(it.latitude, it.longitude, 1) as List<Address>
+                city = location[0].locality
+            }
+            getCurrentWeather(city)
+        }
 
     }
 
@@ -63,7 +131,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("getForecast", "Get Forecast called")
         GlobalScope.launch(Dispatchers.IO) {
             val response = try {
-                RetrofitInstance.api.getForecast("Genoa", "metric", api_key)
+                RetrofitInstance.api.getForecast(city, "metric", api_key)
             } catch (e: IOException) {
                 Toast.makeText(applicationContext, "app error ${e.message}", Toast.LENGTH_SHORT)
                     .show()
@@ -88,10 +156,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getCurrentWeather() {
+    private fun getCurrentWeather(city: String) {
         GlobalScope.launch(Dispatchers.IO){
           val response =  try{
-            RetrofitInstance.api.getCurrentWeather("Genoa", "metric", api_key)
+            RetrofitInstance.api.getCurrentWeather(city, "metric", api_key)
             }catch (e: IOException){
               Toast.makeText(applicationContext, "app error ${e.message}", Toast.LENGTH_SHORT).show()
               return@launch
