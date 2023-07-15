@@ -39,15 +39,38 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/glMainLocation">
 
-            <TextView
-                android:id="@+id/tv_location"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:text="Location"
-                android:textColor="@color/white"
-                android:textSize="34sp"
-                android:textStyle="bold" />
+                android:gravity="center">
+                <ImageView
+                    android:id="@+id/Map"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@android:drawable/ic_dialog_map"
+                    app:tint="@color/white"
+                    android:layout_weight="1"
+                  />
+                <TextView
+                    android:id="@+id/tv_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_horizontal"
+                    android:text="Location"
+                    android:textColor="@color/white"
+                    android:textSize="34sp"
+                    android:textStyle="bold"
+                    android:layout_weight="1"/>
+                <ImageView
+                    android:id="@+id/Locations"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:src="@drawable/world"
+                    app:tint="@color/white"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+
 
             <TextView
                 android:id="@+id/tv_update_time"

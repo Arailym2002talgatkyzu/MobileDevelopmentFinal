@@ -64,4 +64,9 @@ dependencies {
 
     //location
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+
+    implementation 'de.hdodenhof:circleimageview:3.0.1'
+    implementation 'com.google.android.material:material:1.0.0'
+
+
 }
