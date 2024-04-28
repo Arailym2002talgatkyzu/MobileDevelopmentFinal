@@ -29,4 +29,5 @@ interface ApiInterface {
         @Query("units") units: String,
         @Query("appid") apiKey: String
     ): Response<Forecast>
+
 }

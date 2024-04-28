@@ -1,6 +1,7 @@
 package com.example.mobiledevelopmentfinal
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Address
 import android.location.Geocoder
@@ -15,6 +16,7 @@ import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevelopmentfinal.adapter.RvAdapter
+import com.example.mobiledevelopmentfinal.data.LocationModel
 import com.example.mobiledevelopmentfinal.data.forecastModels.ForecastData
 import com.example.mobiledevelopmentfinal.data.utils.RetrofitInstance
 import com.example.mobiledevelopmentfinal.databinding.ActivityMainBinding
@@ -24,10 +26,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -41,7 +40,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sheetLayoutBinding: BottomSheetLayoutBinding
     private lateinit var dialog: BottomSheetDialog
     lateinit var pollutionFragment: PollutionFragment
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding =ActivityMainBinding.inflate(layoutInflater)
@@ -50,8 +48,20 @@ class MainActivity : AppCompatActivity() {
         dialog.setContentView(sheetLayoutBinding.root)
         setContentView(binding.root)
 
+        if(intent.hasExtra(Locations.LOCATION_DETAILS)){
+            // get the Serializable data model class with the details in it
+            city =
+                intent.getStringExtra(Locations.LOCATION_DETAILS) as String
+        }
+
+        binding.Locations.setOnClickListener{
+            val intent = Intent(this, Locations::class.java)
+            startActivity(intent)
+            this?.finish()
+        }
+
         pollutionFragment = PollutionFragment()
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(this)
+
 
         binding.searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(query: String?): Boolean {
@@ -69,49 +79,14 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        fetchLocation()
+
         getCurrentWeather(city)
 
         binding.tvForecast.setOnClickListener{
             openDialog()
         }
 
-        binding.tvLocation.setOnClickListener {
-            fetchLocation()
-        }
 
-    }
-
-    //Works only on physical device
-    private fun fetchLocation() {
-        val task: Task<Location> = fusedLocationProviderClient.lastLocation
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-
-        task.addOnSuccessListener {
-            val geoCoder = Geocoder(this, Locale.getDefault())
-            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU){
-                geoCoder.getFromLocation(it.latitude, it.longitude, 1, object: Geocoder.GeocodeListener{
-                    override fun onGeocode(locations: MutableList<Address>) {
-                        city = locations[0].locality
-                    }
-
-                })
-            }
-            else{
-                val location = geoCoder.getFromLocation(it.latitude, it.longitude, 1) as List<Address>
-                city = location[0].locality
-            }
-            getCurrentWeather(city)
-        }
 
     }
 
@@ -157,12 +132,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun getCurrentWeather(city: String) {
+
         GlobalScope.launch(Dispatchers.IO){
-          val response =  try{
-            RetrofitInstance.api.getCurrentWeather(city, "metric", api_key)
+            val response =  try{
+                RetrofitInstance.api.getCurrentWeather(city, "metric", api_key)
             }catch (e: IOException){
-              Toast.makeText(applicationContext, "app error ${e.message}", Toast.LENGTH_SHORT).show()
-              return@launch
+                Toast.makeText(applicationContext, "app error ${e.message}", Toast.LENGTH_SHORT).show()
+                return@launch
             }
             catch (e: HttpException){
                 Toast.makeText(applicationContext, "http error ${e.message}", Toast.LENGTH_SHORT).show()

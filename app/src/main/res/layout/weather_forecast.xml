@@ -3,21 +3,15 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/gradient_bg"
     android:orientation="vertical">
-
-    <ListView
-        android:id="@+id/ListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/AddCity"
-        android:orientation="vertical" />
 
     <RelativeLayout
         android:id="@+id/AddCity"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone">
+        android:background="@drawable/gradient_bg"
+   >
 
         <EditText
             android:id="@+id/City"
@@ -31,12 +25,13 @@
             android:hint="Search for city..."
             android:textColor="@color/white"
             android:inputType="text"
-            android:textSize="17sp" />
+            android:textSize="15sp"
+            />
 
         <ImageView
             android:id="@+id/Save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
@@ -48,17 +43,21 @@
 
     </RelativeLayout>
 
-    <ImageView
-        android:id="@+id/Add"
-        android:layout_width="50dp"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/idRVLocations"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:contentDescription="Add"
-        android:padding="5dp"
-        android:src="@android:drawable/ic_menu_add"
-        android:visibility="gone"
-        app:tint="@color/white" />
+        android:layout_below="@id/AddCity"
+       />
 
+    <TextView
+        android:id="@+id/noCity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="No cities added yet!"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        android:visibility="gone"/>
 </RelativeLayout>

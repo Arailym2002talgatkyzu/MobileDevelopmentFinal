@@ -8,7 +8,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="80dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
         app:cardCornerRadius="5dp"
@@ -27,7 +27,7 @@
             android:padding="5dp"
             android:background="@color/colorBackTransparentLight">
 
-            <de.hdodenhof.circleimageview.CircleImageView
+            <ImageView
                 android:id="@+id/tvWeatherIcon"
                 android:layout_width="70dp"
                 android:layout_height="70dp"
@@ -46,7 +46,7 @@
                     android:id="@+id/tvCity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="25sp"
                     android:textStyle="bold"
                     tools:text="Genoa" />
@@ -55,19 +55,21 @@
                     android:id="@+id/tvCondition"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     android:textSize="20sp"
                     tools:text="Clear sky" />
             </LinearLayout>
             <TextView
+                android:id="@+id/tvTemp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="37°"
-                android:textSize="30sp"
+                android:textSize="25sp"
                 android:textStyle="bold"
-                android:layout_marginStart="150dp"
-                android:textColor="@color/black"
-                android:gravity="center"/>
+                android:layout_weight="1"
+                android:textColor="@color/white"
+                android:gravity="end"
+                android:layout_marginEnd="10dp"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
