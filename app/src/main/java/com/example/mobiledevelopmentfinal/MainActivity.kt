@@ -48,6 +48,7 @@ class MainActivity : AppCompatActivity() {
         dialog.setContentView(sheetLayoutBinding.root)
         setContentView(binding.root)
 
+        //Getting intent from Locations activity(open the weather of specific city)
         if(intent.hasExtra(Locations.LOCATION_DETAILS)){
             // get the Serializable data model class with the details in it
             city =
