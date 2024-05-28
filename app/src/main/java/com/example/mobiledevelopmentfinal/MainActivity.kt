@@ -30,6 +30,11 @@ import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -50,7 +55,7 @@ class MainActivity : AppCompatActivity() {
 
         //Getting intent from Locations activity(open the weather of specific city)
         if(intent.hasExtra(Locations.LOCATION_DETAILS)){
-            // get the Serializable data model class with the details in it
+            // get the city name
             city =
                 intent.getStringExtra(Locations.LOCATION_DETAILS) as String
         }
@@ -153,38 +158,50 @@ class MainActivity : AppCompatActivity() {
 
                     val imgurl ="https://openweathermap.org/img/wn/$iconId@4x.png"
                     Picasso.get().load(imgurl).into(binding.imgWeather)
-                    binding.tvSunrise.text=
-                        SimpleDateFormat(
-                            "hh:mm a",
-                            Locale.ENGLISH
-                        ).format(data.sys.sunrise*1000)
 
-                    binding.tvSunset.text=
-                        SimpleDateFormat(
-                            "hh:mm a",
-                            Locale.ENGLISH
-                        ).format(data.sys.sunset*1000)
+                    val sunrise = timeFormatter(data.sys.sunrise, data.timezone)
+                    val sunset = timeFormatter(data.sys.sunset, data.timezone)
+                    binding.tvSunrise.text=sunrise
+                    binding.tvSunset.text=sunset
+
                     binding.apply {
-                        tvStatus.text=data.weather[0].description
+                        tvStatus.text=capitalizeFirstChar(data.weather[0].description)
                         tvWind.text="${data.wind.speed.toString()} KM/H"
-                        tvLocation.text = "${data.name}\n${data.sys.country}"
+                        tvLocation.text = "${data.name}, ${data.sys.country}"
                         tvTemp.text = "${data.main.temp.toInt()}°C"
                         tvFeelsLike.text = "Feels like: ${data.main.feels_like.toInt()}°C"
                         tvMinTemp.text = "Min temp: ${data.main.temp_min.toInt()}°C"
                         tvMaxTemp.text = "Max temp: ${data.main.temp_max.toInt()}°C"
                         tvHumidity.text = "${data.main.humidity} %"
                         tvPressure.text = "${data.main.pressure} hPa"
-                        tvUpdateTime.text = "Last updated: ${
-                            SimpleDateFormat(
-                                "hh:mm a",
-                                Locale.ENGLISH
-                            ).format(data.dt*1000)
-                        }"
+                        val updTime = getCurrentLocalDateTime()
+                        tvUpdateTime.text = "Updated: "+updTime
 
                         getPollution(data.coord.lat, data.coord.lon)
                     }
                 }
             }
+        }
+    }
+
+    //function to Format the time from API according to timezone
+    private fun timeFormatter(tmstmp: Int, tmz: Int): CharSequence?{
+        val zoneId = ZoneId.ofOffset("UTC", java.time.ZoneOffset.ofTotalSeconds(tmz))
+        val zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(tmstmp.toLong()), zoneId)
+        val formatter = DateTimeFormatter.ofPattern("hh:mm a")
+        return zonedDateTime.format(formatter)
+    }
+
+    fun getCurrentLocalDateTime(): String {
+        val current = LocalDateTime.now()
+        val formatter = DateTimeFormatter.ofPattern("dd/MM HH:mm")
+        return current.format(formatter)
+    }
+
+    fun capitalizeFirstChar(input: String): String {
+        if (input.isEmpty()) return input
+        return input.replaceFirstChar {
+            if (it.isLowerCase()) it.titlecase() else it.toString()
         }
     }
 

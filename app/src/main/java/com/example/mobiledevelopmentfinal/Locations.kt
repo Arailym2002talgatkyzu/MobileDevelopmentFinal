@@ -88,16 +88,6 @@ class Locations : AppCompatActivity() {
             // to our recycler view.
         }).attachToRecyclerView(locationRV)
 
-        locationRVAdapter.setOnClickListener(object: LocationListRvAdapter.OnClickListener{
-            override fun onClick(position: Int, model: LocationModel) {
-                val intent = Intent(this@Locations, MainActivity::class.java)
-                intent.putExtra(LOCATION_DETAILS, model.cityName) // Passing the cityName to the main activity using intent.
-                startActivity(intent)
-            }
-        })
-
-
-
     }
 
     private fun loadData() {
@@ -166,7 +156,13 @@ class Locations : AppCompatActivity() {
                                 )
                             )
                             locationRVAdapter.notifyDataSetChanged()
-
+                            locationRVAdapter.setOnClickListener(object: LocationListRvAdapter.OnClickListener{
+                                override fun onClick(position: Int, model: LocationModel) {
+                                    val intent = Intent(this@Locations, MainActivity::class.java)
+                                    intent.putExtra(LOCATION_DETAILS, model.cityName) // Passing the cityName to the main activity using intent.
+                                    startActivity(intent)
+                                }
+                            })
                         }
                     }
                 }
