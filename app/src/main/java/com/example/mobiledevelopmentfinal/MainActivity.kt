@@ -1,41 +1,27 @@
 package com.example.mobiledevelopmentfinal
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.location.Address
-import android.location.Geocoder
-import android.location.Location
-import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import android.widget.SearchView
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.mobiledevelopmentfinal.adapter.RvAdapter
-import com.example.mobiledevelopmentfinal.data.LocationModel
 import com.example.mobiledevelopmentfinal.data.forecastModels.ForecastData
 import com.example.mobiledevelopmentfinal.data.utils.RetrofitInstance
 import com.example.mobiledevelopmentfinal.databinding.ActivityMainBinding
 import com.example.mobiledevelopmentfinal.databinding.BottomSheetLayoutBinding
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.Task
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.*
 import retrofit2.HttpException
 import java.io.IOException
-import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 import kotlin.collections.ArrayList
 
 class MainActivity : AppCompatActivity() {

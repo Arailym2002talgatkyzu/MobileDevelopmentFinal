@@ -83,6 +83,7 @@ class Locations : AppCompatActivity() {
                             saveCity(this@Locations,deletedLocation.cityName.lowercase())
                             locationRVAdapter.notifyItemInserted(position)
                         }).show()
+                loadData()
             }
             // at last we are adding this
             // to our recycler view.
